@@ -6,6 +6,53 @@
     <title>Login</title>
     <link rel="stylesheet" href="../styles/login.css">
 </head>
+<script>
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const errorMessage = document.getElementById('errorMessage');
+    const loading = document.getElementById('loading');
+    const submitButton = document.getElementById('submitButton');
+    
+    // Mostrar loading y ocultar botón
+    loading.style.display = 'block';
+    submitButton.disabled = true;
+    errorMessage.style.display = 'none';
+    
+    // Enviar datos al servidor
+    fetch('/api/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            username: username,
+            password: password
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Redirigir al index después del login exitoso
+            window.location.href = '/';
+        } else {
+            errorMessage.textContent = data.message;
+            errorMessage.style.display = 'block';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        errorMessage.textContent = 'Error de conexión';
+        errorMessage.style.display = 'block';
+    })
+    .finally(() => {
+        loading.style.display = 'none';
+        submitButton.disabled = false;
+    });
+});
+</script>
 <body>
     <div class="login-container">
         <h1 class="login-title">Iniciar Sesión</h1>

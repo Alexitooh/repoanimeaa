@@ -6,6 +6,60 @@
     <title>AnimeFinder - Encuentra tus animes favoritos</title>
         <link rel="stylesheet" href="../styles/index.css">
     </head>
+    <script>
+document.getElementById('searchForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const animeName = document.getElementById('animeName').value;
+    const loading = document.getElementById('loading');
+    const errorMessage = document.getElementById('errorMessage');
+    const resultsSection = document.getElementById('resultsSection');
+    const recommendationsGrid = document.getElementById('recommendationsGrid');
+    
+    // Mostrar loading
+    loading.style.display = 'block';
+    errorMessage.style.display = 'none';
+    
+    // Buscar recomendaciones
+    fetch('/api/recomendaciones', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            animeName: animeName
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Limpiar resultados anteriores
+        recommendationsGrid.innerHTML = '';
+        
+        // Mostrar resultados
+        data.animes.forEach(anime => {
+            const animeElement = document.createElement('div');
+            animeElement.className = 'anime-card';
+            animeElement.innerHTML = `
+                <h3>${anime.nombre}</h3>
+                <p><strong>Género:</strong> ${anime.genero}</p>
+                <p><strong>Puntuación:</strong> ${anime.puntuacion}/10</p>
+                <p>${anime.descripcion}</p>
+            `;
+            recommendationsGrid.appendChild(animeElement);
+        });
+        
+        resultsSection.style.display = 'block';
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        errorMessage.textContent = 'Error al buscar recomendaciones';
+        errorMessage.style.display = 'block';
+    })
+    .finally(() => {
+        loading.style.display = 'none';
+    });
+});
+</script>
 <body>
     <header>
         <div class="container">
